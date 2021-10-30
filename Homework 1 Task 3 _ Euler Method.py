@@ -61,6 +61,9 @@ x_b, t_b = num_sol(a = 1, h = 0.1, x0 = 0.5, t0 = 0, t_lim = 7)
 x_c, t_c = num_sol(a = 1, h = 0.01, x0 = 0.5, t0 = 0, t_lim = 7)
 x_d, t_d = num_sol(a = 3, h = 0.5, x0 = 3, t0 = 0, t_lim = 7)
 
+# QUESTION: Is it possible to type this into one row via entering a list of four vectors, which can be put into the argument of the function?
+# something like:  variables = [[1,0.5,0.5,0,7],[1,0.1 ...... 
+#                  num_sol(variables)                                ??
 
 
 
