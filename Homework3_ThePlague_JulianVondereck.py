@@ -66,7 +66,7 @@ ts = np.arange(0, n_steps*h, h)
 x = [1000,2,0]
 xs = [x]    
 
-#plt.plot ( ts [0] , x[-1] , 'ro')
+
 
 for t in ts[1:]:
     
@@ -81,13 +81,14 @@ for t in ts[1:]:
     
 xs = np.array(xs)
 fig = plt.figure()    
-plt.plot (ts, xs[:,0], 'g', label = 'S')
+plt.plot (ts, xs[:,0], 'g', label = 'susceptible')
 plt.legend('S')
-plt.plot (ts, xs[:,1], 'r', label = 'I')
+plt.plot (ts, xs[:,1], 'r', label = 'infected')
 plt.legend('I')
-plt.plot (ts, xs[:,2], 'b', label = 'R')
-plt.title('S I R model', fontweight="bold")
+plt.plot (ts, xs[:,2], 'b', label = 'recovered')
+plt.title('S I R model  with  ' r'$\beta='+ str(b)+'$' '  &  ' r'$\gamma =' + str(gam)+'$', fontweight="bold")
 plt.xlabel("t in days")
+plt.ylabel("people")
 plt.legend()
 
 
