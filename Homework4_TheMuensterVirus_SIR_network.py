@@ -11,8 +11,8 @@ Homework 4 - Task 6: The Münster-Virus
 '''
 
 import numpy as np
-import matplotlib.pyplot as plt
-#from rk4 import *
+# import matplotlib.pyplot as plt
+
 
 
 def rk4_step(rhs, x, function_parameters, h):
