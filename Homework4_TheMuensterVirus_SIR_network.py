@@ -11,8 +11,7 @@ Homework 4 - Task 6: The Münster-Virus
 '''
 
 import numpy as np
-# import matplotlib.pyplot as plt
-
+#import matplotlib.pyplot as plt
 
 
 def rk4_step(rhs, x, function_parameters, h):
@@ -68,12 +67,12 @@ Sn = np.zeros((len(ts),len(M)))
 Sn[0,:] = pop                   # put in population numbers from ext. data
 In = np.zeros((len(ts),len(M)))
 In[0,0] = 20                     # let virus start in Muenster
-Sn[0,0] = Sn[0,0] - In[0,0]     # so that start population is still according to 'Populations.csv'
+Sn[0,0] = Sn[0,0] - In[0,0]     # in order to make that total start population in Münster is still according to 'Populations.csv'
 Rn = np.zeros((len(ts),len(M)))
 
 
 
-for n in range(1,len(M)):
+for n in range(0,len(M)):
     
     for i in range(1,Nt):
         U = [Sn[i,n], In[i,n], Rn[i,n]]
