@@ -22,6 +22,7 @@ def rk4_step(rhs, x, function_parameters, h):
     return x + h/6.*(k1 + 2*(k2 + k3) + k4)
 
 def SIR(U, alpha, beta, n, matrix, S_dummy, I_dummy, R_dummy):
+    # pass vectors of len(M), wrapped together in U
     S, I, R = U
     
     
@@ -30,7 +31,7 @@ def SIR(U, alpha, beta, n, matrix, S_dummy, I_dummy, R_dummy):
     for i in range(0,len(M)):
         N[i] = Sn[0,i] + In[0,i] + Rn[0,i]
         
-    
+    # these should have the same dimension as S, I, R, i.e. a len(M) vector    
     sum_S = 0
     sum_I = 0
     sum_R = 0
@@ -75,6 +76,7 @@ Rn = np.zeros((len(ts),len(M)))
 # for n in range(0,len(M)):
     
 for i in range(1,Nt):
+    # here u should wrap together the len(M) vectors S, I, R
     U = [Sn[i,n], In[i,n], Rn[i,n]]
     S = Sn[i,:]
     I = In[i,:]
