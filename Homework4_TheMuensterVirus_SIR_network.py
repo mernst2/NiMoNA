@@ -35,12 +35,12 @@ def SIR(U, alpha, beta, n, matrix, S_dummy, I_dummy, R_dummy):
     sum_I = 0
     sum_R = 0
     
-    
-    for m in range(0,len(M)):
-             
-        sum_S = sum_S + matrix[n,m] * S_dummy[m] - matrix[m,n] * S
-        sum_I = sum_I + matrix[n,m] * I_dummy[m] - matrix[m,n] * I
-        sum_R = sum_R + matrix[n,m] * R_dummy[m] - matrix[m,n] * R
+    for n in range(0, len(M)):
+        for m in range(0,len(M)):
+                
+            sum_S = sum_S + matrix[n,m] * S_dummy[m] - matrix[m,n] * S
+            sum_I = sum_I + matrix[n,m] * I_dummy[m] - matrix[m,n] * I
+            sum_R = sum_R + matrix[n,m] * R_dummy[m] - matrix[m,n] * R
         
     dS = -alpha*S*I/N[n] + sum_S
     dI = alpha*S*I/N[n] - beta*I + sum_I
@@ -72,15 +72,15 @@ Rn = np.zeros((len(ts),len(M)))
 
 
 
-for n in range(0,len(M)):
+# for n in range(0,len(M)):
     
-    for i in range(1,Nt):
-        U = [Sn[i,n], In[i,n], Rn[i,n]]
-        S = Sn[i,:]
-        I = In[i,:]
-        R = Rn[i,:]
-        U = rk4_step(SIR, U, [alpha, beta, n, M, S, R, I], dt)
-        Sn[i,n], In[i,n], Rn[i,n] = U
+for i in range(1,Nt):
+    U = [Sn[i,n], In[i,n], Rn[i,n]]
+    S = Sn[i,:]
+    I = In[i,:]
+    R = Rn[i,:]
+    U = rk4_step(SIR, U, [alpha, beta, n, M, S, R, I], dt)
+    Sn[i,n], In[i,n], Rn[i,n] = U
         
 
 
