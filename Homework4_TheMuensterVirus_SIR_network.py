@@ -42,7 +42,7 @@ def SIR(U, alpha, beta, matrix):
                     dS[n] = dS[n] + S[m] - S[n]     # ohne matrix kein error
                     dI[n] = dI[n] +   I[m] -  I[n]
                     dR[n] = dR[n] +  R[m] -  R[n]
-#                    
+                    
                     '''
                     hier entsteht der Fehler, in S[m]/S[n],R[m]/.. etc..
                     
