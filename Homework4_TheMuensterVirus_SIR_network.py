@@ -27,8 +27,7 @@ def SIR(U, alpha, beta, matrix):
     dR =  beta*I 
     
 
-    for i in range(0,len(matrix)):
-        N[i] = Sn[0,i] + In[0,i] + Rn[0,i]
+  
     
     for n in range(0,len(matrix)):
             for m in range(0,len(matrix)):
@@ -40,16 +39,16 @@ def SIR(U, alpha, beta, matrix):
 #                    dI[n] = dI[n] + matrix[n,m] * I[m] - matrix[m,n] * I[n]
 #                    dR[n] = dR[n] + matrix[n,m] * R[m] - matrix[m,n] * R[n]
                     
-#                    dS[n] = dS[n] + S[m] - S[n]     
-#                    dI[n] = dI[n] +   I[m] -  I[n]
-#                    dR[n] = dR[n] +  R[m] -  R[n]
+                    dS[n] = dS[n] + S[m] - S[n]     # ohne matrix kein error
+                    dI[n] = dI[n] +   I[m] -  I[n]
+                    dR[n] = dR[n] +  R[m] -  R[n]
 #                    
                     '''
                     hier entsteht der Fehler, in S[m]/S[n],R[m]/.. etc..
                     
                     '''
 ##                    
-#                    dS[n] = dS[n] + matrix[n,m]  - matrix[m,n] 
+#                    dS[n] = dS[n] + matrix[n,m]  - matrix[m,n]   #ohne S[m]/S[n],R[m]/.. kein error
 #                    dI[n] = dI[n] + matrix[n,m]  - matrix[m,n] 
 #                    dR[n] = dR[n] + matrix[n,m]  - matrix[m,n] 
 #                      
