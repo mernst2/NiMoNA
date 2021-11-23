@@ -27,7 +27,6 @@ def SIR(U, alpha, beta, matrix):
     dR =  beta*I 
     
 
-
     for i in range(0,len(matrix)):
         N[i] = Sn[0,i] + In[0,i] + Rn[0,i]
     
@@ -36,20 +35,24 @@ def SIR(U, alpha, beta, matrix):
                 
                 if m != n:
                 
-                    
-#                    dS[n] = dS[n] + matrix[n,m] * S[m] - matrix[m,n] * S[n]     
+#                    
+#                    dS[n] = dS[n] + matrix[n,m] * S[m] - matrix[m,n] * S[n]     # eigentlicher Code
 #                    dI[n] = dI[n] + matrix[n,m] * I[m] - matrix[m,n] * I[n]
 #                    dR[n] = dR[n] + matrix[n,m] * R[m] - matrix[m,n] * R[n]
                     
+#                    dS[n] = dS[n] + S[m] - S[n]     
+#                    dI[n] = dI[n] +   I[m] -  I[n]
+#                    dR[n] = dR[n] +  R[m] -  R[n]
+#                    
                     '''
-                    hier entsteht der Fehler, in S[m]/S[n],R[m] etc..
+                    hier entsteht der Fehler, in S[m]/S[n],R[m]/.. etc..
                     
                     '''
-                    
-                    dS[n] = dS[n] + matrix[n,m]  - matrix[m,n] 
-                    dI[n] = dI[n] + matrix[n,m]  - matrix[m,n] 
-                    dR[n] = dR[n] + matrix[n,m]  - matrix[m,n] 
-                      
+##                    
+#                    dS[n] = dS[n] + matrix[n,m]  - matrix[m,n] 
+#                    dI[n] = dI[n] + matrix[n,m]  - matrix[m,n] 
+#                    dR[n] = dR[n] + matrix[n,m]  - matrix[m,n] 
+#                      
                 
     return np.array([dS, dI, dR])
 
@@ -65,7 +68,7 @@ beta = 0.035
 
 # load extern data
 adj_matrix  =   np.loadtxt('AdjacencyMuenster.csv', delimiter = ',', skiprows = 1, usecols = (1,2,3,4,5,6,7,8,9,10,11))
-pop         =   np.loadtxt('Populations.csv', delimiter = ',', usecols = (1)) 
+pop         =   np.loadtxt('Populations2.csv', delimiter = ',', usecols = (1)) 
 
 M = adj_matrix + np.transpose(adj_matrix)  # add transposed matrix to make sure population is constant
 
@@ -76,19 +79,63 @@ In[0,0] = 20                     # let virus start in Muenster
 Sn[0,0] = Sn[0,0] - In[0,0]     # in order to make that total start population in Münster is still according to 'Populations.csv'
 Rn = np.zeros((len(ts),len(M)))
 
+
 U = [Sn[0,:], In[0,:], Rn[0,:]]
+
+sumS = np.zeros(np.shape(ts))   # array for total numbers of all cities
+sumI = np.zeros(np.shape(ts))
+sumR = np.zeros(np.shape(ts))
+sumS[0] = sum(Sn[0,:])
+sumI[0] = sum(In[0,:])
+sumR[0] = sum(Rn[0,:])
 
 for i in range(1,Nt):
     U = rk4_step(SIR, U, [alpha, beta, M], dt)
     Sn[i], In[i], Rn[i,:] = U   # Sn[i] funktioniert hier wie Sn[i,:]
+    sumS[i] = sum(Sn[i,:])
+    sumI[i] = sum(In[i,:])
+    sumR[i] = sum(Rn[i,:])
+    
     
 
-y = In
 
-plt.plot(ts, Sn[:,0], 'C0-')
-plt.plot(ts, In[:,0], 'C3-')
-plt.plot(ts, Rn[:,0], 'C2-')
-plt.title('S I R model  with  ' r'$\beta='+ str(alpha)+'$' '  &  ' r'$\gamma =' + str(beta)+'$', fontweight="bold")
+#plt.plot(ts, Sn[:,0], 'C0-')
+#plt.plot(ts, In[:,0], 'C3-')
+#plt.plot(ts, Rn[:,0], 'C2-')
+#plt.title('S I R model  with  ' r'$\beta='+ str(alpha)+'$' '  &  ' r'$\gamma =' + str(beta)+'$', fontweight="bold")
+#    
+
+
+
+
+fig1 = plt.figure(1)
+plt.clf()
+
+
+
+# Plot the subplots
+
+
+for c in range(0,len(M)):
+    plt.subplot(3, 4, c+1)
+    plt.plot(ts, Sn[:,c], 'C0-')
+    plt.plot(ts, In[:,c], 'C3-')
+    plt.plot(ts, Rn[:,c], 'C2-')
+#    plt.xlabel('$t/days$')
+
+#    plt.legend(loc='upper right')
+plt.subplot(3,4,12)
+plt.plot(ts, sumS,'C0-')
+plt.plot(ts, sumI, 'C3-')
+plt.plot(ts, sumR, 'C2-')
+plt.title('total numbers', fontsize=9)
+plt.xlabel('t in days')
+
+plt.suptitle('SIR network', fontsize=19, fontweight='bold')
 
 plt.show()
+
+
+
+
 
