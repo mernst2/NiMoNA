@@ -119,12 +119,12 @@ for c in range(0,len(M)):
     plt.plot(ts, Rn[:,c], 'C2-')
     plt.title(name_list[c], fontsize=9)
     
-for c in range(0,8):
+for c in range(0,8):        # remove x label for first two rows
     plt.subplot(3, 4, c+1)
     plt.tick_params(
     axis='x',          # changes apply to the x-axis
     which='both',      # both major and minor ticks are affected
-    bottom=False,      # ticks along the bottom edge are off
+    bottom=True,      # ticks along the bottom edge are on
     top=False,         # ticks along the top edge are off
     labelbottom=False) # labels along the bottom edge are off
     
