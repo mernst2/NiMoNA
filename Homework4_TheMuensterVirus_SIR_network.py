@@ -36,7 +36,7 @@ def SIR(U, alpha, beta, matrix):
                 if m != n:
                 
 #                    
-                    dS[n] = dS[n] + matrix[n,m]/N[m] * S[m] - matrix[m,n]/N[n] * S[n]     # eigentlicher Code
+                    dS[n] = dS[n] + matrix[n,m]/N[m] * S[m] - matrix[m,n]/N[n] * S[n]     
                     dI[n] = dI[n] + matrix[n,m]/N[m] * I[m] - matrix[m,n]/N[n] * I[n]
                     dR[n] = dR[n] + matrix[n,m]/N[m] * R[m] - matrix[m,n]/N[n] * R[n]
                     
@@ -119,14 +119,14 @@ for c in range(0,len(M)):
     plt.title(name_list[c], fontsize=7)
 #    plt.xlabel('$t/days$')
 
-#    plt.legend(loc='upper right')
+
 plt.subplot(3,4,12)
 plt.plot(ts, sumS,'C0-')
 plt.plot(ts, sumI, 'C3-')
 plt.plot(ts, sumR, 'C2-')
 plt.title('total numbers', fontsize=9)
 plt.xlabel('t in days')
-plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
+plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))  #damit die y-Achsen-Zahlen nicht so viel Platz einnehmen
 
 plt.suptitle('SIR network', fontsize=19, fontweight='bold')
 
