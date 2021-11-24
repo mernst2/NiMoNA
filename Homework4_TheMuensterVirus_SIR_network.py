@@ -7,6 +7,7 @@ Created on Mon Nov 22 15:27:25 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
 def rk4_step(rhs, x, function_parameters, h):
     k1 = rhs(x, *function_parameters)
@@ -35,23 +36,11 @@ def SIR(U, alpha, beta, matrix):
                 if m != n:
                 
 #                    
-#                    dS[n] = dS[n] + matrix[n,m] * S[m] - matrix[m,n] * S[n]     # eigentlicher Code
-#                    dI[n] = dI[n] + matrix[n,m] * I[m] - matrix[m,n] * I[n]
-#                    dR[n] = dR[n] + matrix[n,m] * R[m] - matrix[m,n] * R[n]
+                    dS[n] = dS[n] + matrix[n,m]/N[m] * S[m] - matrix[m,n]/N[n] * S[n]     # eigentlicher Code
+                    dI[n] = dI[n] + matrix[n,m]/N[m] * I[m] - matrix[m,n]/N[n] * I[n]
+                    dR[n] = dR[n] + matrix[n,m]/N[m] * R[m] - matrix[m,n]/N[n] * R[n]
                     
-                    dS[n] = dS[n] + S[m] - S[n]     # ohne matrix kein error
-                    dI[n] = dI[n] +   I[m] -  I[n]
-                    dR[n] = dR[n] +  R[m] -  R[n]
-                    
-                    '''
-                    hier entsteht der Fehler, in S[m]/S[n],R[m]/.. etc..
-                    
-                    '''
-##                    
-#                    dS[n] = dS[n] + matrix[n,m]  - matrix[m,n]   #ohne S[m]/S[n],R[m]/.. kein error
-#                    dI[n] = dI[n] + matrix[n,m]  - matrix[m,n] 
-#                    dR[n] = dR[n] + matrix[n,m]  - matrix[m,n] 
-#                      
+                  
                 
     return np.array([dS, dI, dR])
 
@@ -74,7 +63,7 @@ M = adj_matrix + np.transpose(adj_matrix)  # add transposed matrix to make sure 
 Sn = np.zeros((len(ts),len(M)))
 Sn[0,:] = pop                   # put in population numbers from ext. data
 In = np.zeros((len(ts),len(M)))
-In[0,0] = 20                     # let virus start in Muenster
+In[0,0] = 20                    # let virus start in Muenster
 Sn[0,0] = Sn[0,0] - In[0,0]     # in order to make that total start population in Münster is still according to 'Populations.csv'
 Rn = np.zeros((len(ts),len(M)))
 
@@ -96,13 +85,20 @@ for i in range(1,Nt):
     sumR[i] = sum(Rn[i,:])
     
     
+name_list = [[]] * len(M)           # to read first row of populations2.csv, to use for plot titles
+c = 0
+with open('Populations2.csv') as csvfile:
+    readCSV = csv.reader(csvfile, delimiter=',')
+    for row in readCSV:
+        name_list[c] = row[0]
+        c = c+1
 
 
-#plt.plot(ts, Sn[:,0], 'C0-')
-#plt.plot(ts, In[:,0], 'C3-')
-#plt.plot(ts, Rn[:,0], 'C2-')
-#plt.title('S I R model  with  ' r'$\beta='+ str(alpha)+'$' '  &  ' r'$\gamma =' + str(beta)+'$', fontweight="bold")
-#    
+plt.plot(ts, Sn[:,0], 'C0-')
+plt.plot(ts, In[:,0], 'C3-')
+plt.plot(ts, Rn[:,0], 'C2-')
+plt.title('S I R model  with  ' r'$\beta='+ str(alpha)+'$' '  &  ' r'$\gamma =' + str(beta)+'$', fontweight="bold")
+    
 
 
 
@@ -120,6 +116,7 @@ for c in range(0,len(M)):
     plt.plot(ts, Sn[:,c], 'C0-')
     plt.plot(ts, In[:,c], 'C3-')
     plt.plot(ts, Rn[:,c], 'C2-')
+    plt.title(name_list[c], fontsize=7)
 #    plt.xlabel('$t/days$')
 
 #    plt.legend(loc='upper right')
@@ -129,10 +126,13 @@ plt.plot(ts, sumI, 'C3-')
 plt.plot(ts, sumR, 'C2-')
 plt.title('total numbers', fontsize=9)
 plt.xlabel('t in days')
+plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
 
 plt.suptitle('SIR network', fontsize=19, fontweight='bold')
 
 plt.show()
+
+
 
 
 
