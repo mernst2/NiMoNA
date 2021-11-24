@@ -35,7 +35,7 @@ def SIR(U, alpha, beta, matrix):
                 
                 if m != n:
                 
-#                    
+                    
                     dS[n] = dS[n] + matrix[n,m]/N[m] * S[m] - matrix[m,n]/N[n] * S[n]     
                     dI[n] = dI[n] + matrix[n,m]/N[m] * I[m] - matrix[m,n]/N[n] * I[n]
                     dR[n] = dR[n] + matrix[n,m]/N[m] * R[m] - matrix[m,n]/N[n] * R[n]
@@ -85,6 +85,7 @@ for i in range(1,Nt):
     sumR[i] = sum(Rn[i,:])
     
     
+    
 name_list = [[]] * len(M)           # to read first row of populations2.csv, to use for plot titles
 c = 0
 with open('Populations2.csv') as csvfile:
@@ -116,7 +117,17 @@ for c in range(0,len(M)):
     plt.plot(ts, Sn[:,c], 'C0-')
     plt.plot(ts, In[:,c], 'C3-')
     plt.plot(ts, Rn[:,c], 'C2-')
-    plt.title(name_list[c], fontsize=7)
+    plt.title(name_list[c], fontsize=9)
+    
+for c in range(0,8):
+    plt.subplot(3, 4, c+1)
+    plt.tick_params(
+    axis='x',          # changes apply to the x-axis
+    which='both',      # both major and minor ticks are affected
+    bottom=False,      # ticks along the bottom edge are off
+    top=False,         # ticks along the top edge are off
+    labelbottom=False) # labels along the bottom edge are off
+    
 #    plt.xlabel('$t/days$')
 
 
@@ -124,9 +135,9 @@ plt.subplot(3,4,12)
 plt.plot(ts, sumS,'C0-')
 plt.plot(ts, sumI, 'C3-')
 plt.plot(ts, sumR, 'C2-')
-plt.title('total numbers', fontsize=9)
+plt.title('total numbers', fontsize=10)
 plt.xlabel('t in days')
-plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))  #damit die y-Achsen-Zahlen nicht so viel Platz einnehmen
+plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
 
 plt.suptitle('SIR network', fontsize=19, fontweight='bold')
 
