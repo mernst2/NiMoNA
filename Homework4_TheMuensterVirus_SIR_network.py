@@ -2,12 +2,21 @@
 """
 Created on Mon Nov 22 15:27:25 2021
 
-@author: Julian
+@authors: Julian & ...
+"""
+
+"""
+
+Homework 4 - The MuensterVirus SIR network
+
+
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+
+# DEFINE TWO NECESSARY FUNCTIONS
 
 def rk4_step(rhs, x, function_parameters, h):
     k1 = rhs(x, *function_parameters)
@@ -44,7 +53,10 @@ def SIR(U, alpha, beta, matrix):
                 
     return np.array([dS, dI, dR])
 
-# parameters
+
+
+# PARAMETERS
+    
 dt = 0.1
 Tend = 150
 Nt = int(Tend/dt)
@@ -54,7 +66,8 @@ alpha = 0.35
 beta = 0.035
 
 
-# load extern data
+# LOAD EXTERN DATA
+
 adj_matrix  =   np.loadtxt('AdjacencyMuenster.csv', delimiter = ',', skiprows = 1, usecols = (1,2,3,4,5,6,7,8,9,10,11))
 pop         =   np.loadtxt('Populations2.csv', delimiter = ',', usecols = (1)) 
 
@@ -79,14 +92,14 @@ sumR[0] = sum(Rn[0,:])
 
 for i in range(1,Nt):
     U = rk4_step(SIR, U, [alpha, beta, M], dt)
-    Sn[i], In[i], Rn[i,:] = U   # Sn[i] funktioniert hier wie Sn[i,:]
+    Sn[i], In[i], Rn[i,:] = U                   # Sn[i] funktioniert hier wie Sn[i,:] 
     sumS[i] = sum(Sn[i,:])
     sumI[i] = sum(In[i,:])
     sumR[i] = sum(Rn[i,:])
     
     
     
-name_list = [[]] * len(M)           # to read first row of populations2.csv, to use for plot titles
+name_list = [[]] * len(M)               # to read first row of populations2.csv, to use for plot titles
 c = 0
 with open('Populations2.csv') as csvfile:
     readCSV = csv.reader(csvfile, delimiter=',')
@@ -104,12 +117,14 @@ plt.title('S I R model  with  ' r'$\beta='+ str(alpha)+'$' '  &  ' r'$\gamma =' 
 
 
 
+
+
+
+# PLOT THE SUBPLOTS
+
 fig1 = plt.figure(1)
 plt.clf()
 
-
-
-# Plot the subplots
 
 
 for c in range(0,len(M)):
@@ -128,8 +143,7 @@ for c in range(0,8):        # remove x label for first two rows
     top=False,         # ticks along the top edge are off
     labelbottom=False) # labels along the bottom edge are off
     
-#    plt.xlabel('$t/days$')
-
+    
 
 plt.subplot(3,4,12)
 plt.plot(ts, sumS,'C0-')
@@ -142,7 +156,6 @@ plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
 plt.suptitle('SIR network', fontsize=19, fontweight='bold')
 
 plt.show()
-
 
 
 
