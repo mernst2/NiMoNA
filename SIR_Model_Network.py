@@ -41,7 +41,8 @@ ANNOTATION_Y_OFFSET = 0.02
 def sir(compartment, infection_rate, removal_rate, adjacency_matrix):
     Susceptible, Infected, Removed = compartment
     TotalPopulation = np.zeros(NUMBER_OF_CITIES)
-
+    # are Susceptible, Infected, and Removed arrays? if yes, you can just add them like S + I + R. 
+    # if not arrays, make them arrays, numpy addition of arrays is almost always faster than a pure pyhton for loop
     for iterator in range(0, NUMBER_OF_CITIES):
         TotalPopulation[iterator] = SusceptibleN[0, iterator] + InfectedN[0, iterator] + RemovedN[0, iterator]
 
