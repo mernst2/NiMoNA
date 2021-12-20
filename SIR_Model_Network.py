@@ -40,11 +40,7 @@ ANNOTATION_Y_OFFSET = 0.02
 
 def sir(compartment, infection_rate, removal_rate, adjacency_matrix):
     Susceptible, Infected, Removed = compartment
-    TotalPopulation = np.zeros(NUMBER_OF_CITIES)
-    # are Susceptible, Infected, and Removed arrays? if yes, you can just add them like S + I + R. 
-    # if not arrays, make them arrays, numpy addition of arrays is almost always faster than a pure pyhton for loop
-    for iterator in range(0, NUMBER_OF_CITIES):
-        TotalPopulation[iterator] = SusceptibleN[0, iterator] + InfectedN[0, iterator] + RemovedN[0, iterator]
+    TotalPopulation = SusceptibleN[0, :] + InfectedN[0, :] + RemovedN[0, :]
 
     dS = -infection_rate * Susceptible * Infected / TotalPopulation
     dI = infection_rate * Susceptible * Infected / TotalPopulation - removal_rate * Infected
@@ -90,7 +86,7 @@ CitiesPositionX = popCSV[1]
 CitiesPositionY = popCSV[2]
 
 
-def create_network_plot(save_figs=False, only_calc_last=True):
+def create_network_plot(directory, save_figs=False, only_calc_last=True, plot_figures=False):
     for iterator in range(0, NUMBER_OF_CITIES):
         CitiesPositionX[iterator] = float(CitiesPositionX[iterator])
         CitiesPositionY[iterator] = float(CitiesPositionY[iterator])
@@ -117,16 +113,14 @@ def create_network_plot(save_figs=False, only_calc_last=True):
             ax.annotate(txt, (CitiesPositionX[k] + ANNOTATION_X_OFFSET * len(DistrictNameList[k]), CitiesPositionY[k] +
                               ANNOTATION_Y_OFFSET), weight='bold', color=ANNOTATION_COLOR, zorder=3)
 
-        if only_calc_last:
-            if j == TOTAL_STEPS-1:
-                plt.show()
-        else:
+        if plot_figures:
             plt.show()
 
         if save_figs:
-            plt.savefig('./Network/Plot{number}.png'.format(number=j))
+            ess.check_directory_exists(directory)
+            plt.savefig('{dir}/Plot{number}.png'.format(dir=directory, number=j))
 
-        print("{:.2f} %".format(j / TOTAL_STEPS * 100.0))
+        ess.print_progress(j, TOTAL_STEPS)
         plt.clf()
 
 
@@ -160,6 +154,6 @@ def plot_sir_network():
     plt.clf()
 
 
-create_network_plot()
+create_network_plot("./Network", save_figs=True, only_calc_last=False, plot_figures=False)
 plot_sir_network()
 ess.create_video_of_images("./Network")

@@ -7,6 +7,10 @@ from moviepy.editor import VideoFileClip
 import moviepy.video.fx.all as vfx
 
 
+def print_progress(current, total):
+    print("{:.2f} %".format(current / total * 100.0))
+
+
 def rk4_step(rhs, variable, function_parameter, step_size):
     k1 = rhs(variable, *function_parameter)
     k2 = rhs(variable + k1 * step_size / 2., *function_parameter)
@@ -51,19 +55,23 @@ def atoi(text):
 
 
 def natural_keys(text):
-    '''
-    alist.sort(key=natural_keys) sorts in human order
-    http://nedbatchelder.com/blog/200712/human_sorting.html
-    (See Toothy's implementation in the comments)
-    '''
     return [atoi(c) for c in re.split(r'(\d+)', text)]
+
+
+def check_directory_exists(directory, create_dir=True):
+    p = Path(directory)
+
+    if not p.exists():
+        if create_dir:
+            p.mkdir()
+        return p
+    else:
+        return p
 
 
 def create_video_of_images(pathToImages, imageExtension=".png", movieName="movie", movieExtension=".mp4", fps=30,
                            speed=5):
-    p = Path(pathToImages)
-    if not p.exists():
-        raise RuntimeError('The path to the image folder does not exists. Please enter an existing folder.')
+    check_directory_exists(pathToImages)
 
     filenames = []
 
