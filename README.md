@@ -1,2 +1,2 @@
-# NiMoNA-Homework
-All of my solutions for NiMoNA WS21/22
+# NiMoNa
+Basic code to solve network-driven SIR model
