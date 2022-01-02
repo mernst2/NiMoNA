@@ -1,0 +1,3 @@
+-infection_rate * infectious / total_population,infection_rate * infectious / total_population,0
+0,-remove_rate,remove_rate
+0,0,0

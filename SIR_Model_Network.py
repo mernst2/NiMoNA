@@ -1,10 +1,19 @@
+import numpy
+
 import numpy as np
 import matplotlib.pyplot as plt
 import siressentials as ess
+import numexpr
 
 # Paths
 PATH_ADJACENCY_CSV = 'AdjacencyMuenster.csv'
 PATH_POPULATIONS_CSV = 'Populations2.csv'
+PATH_SIR_ADJACENCY = 'SIR.csv'
+PATH_SIR_PLACEHOLDERS = 'Placeholder.csv'
+
+PLACEHOLDER_COL = 0
+VALUE_COL = 1
+CATEGORY_COL = 2
 
 # Model parameters
 INFECTION_RATE = 0.35
@@ -38,6 +47,48 @@ ANNOTATION_X_OFFSET = -0.01
 ANNOTATION_Y_OFFSET = 0.02
 
 
+def read_sir_csv(path_to_input_network, columns=None, ADelimiter=','):
+    return np.loadtxt(path_to_input_network, dtype=numpy.str, delimiter=ADelimiter, usecols=columns)
+
+
+def replace_placeholders(adjacency_matrix_str, placeholder_list, value_list, category_list, category='p'):
+    adjacency_matrix_final = np.copy(adjacency_matrix_str)
+
+    for i in range(0, len(adjacency_matrix_str)):
+        for j in range(0, len(adjacency_matrix_str)):
+            current_entry = adjacency_matrix_str[i, j]
+            for p in range(0, len(placeholder_list)):
+                if np.char.find(current_entry, placeholder_list[p], start=0, end=None) != -1 \
+                        and category_list[p] == category:
+                    current_entry = np.char.replace(current_entry, placeholder_list[p], value_list[p])
+
+            adjacency_matrix_final[i, j] = current_entry
+
+    return adjacency_matrix_final
+
+
+def replace_variables(adjacency_matrix_str, placeholder_list, value_list, category_list):
+    return replace_placeholders(adjacency_matrix_str, placeholder_list, value_list, category_list, category='v')
+
+
+def sir_as_network(compartment, infection_rate, removal_rate, adjacency_matrix_population):
+    Susceptible, Infected, Removed = compartment
+    TotalPopulation = SusceptibleN[0, :] + InfectedN[0, :] + RemovedN[0, :]
+
+    sir_adjacency_matrix = read_sir_csv(PATH_SIR_ADJACENCY)
+    sir_placeholders = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=PLACEHOLDER_COL)
+    sir_placeholder_values = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=VALUE_COL)
+    sir_placeholder_categories = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=CATEGORY_COL)
+
+    sir_adjacency_matrix = replace_placeholders(sir_adjacency_matrix, sir_placeholders, sir_placeholder_values,
+                                                sir_placeholder_categories)
+    # TODO: Create a value list for the variables in all cities and then figure out how to return a result array that
+    #  looks the same like in "sir"
+
+    result = np.matmul(np.transpose(sir_adjacency_matrix), compartment)
+    return result
+
+
 def sir(compartment, infection_rate, removal_rate, adjacency_matrix):
     Susceptible, Infected, Removed = compartment
     TotalPopulation = SusceptibleN[0, :] + InfectedN[0, :] + RemovedN[0, :]
@@ -58,6 +109,9 @@ def sir(compartment, infection_rate, removal_rate, adjacency_matrix):
     return np.array([dS, dI, dR])
 
 
+# Format of the compartments U[x, y]
+# x: Index for compartment value at the x-th time-step
+# y: The y-th city
 SusceptibleN = np.zeros((len(TIME_STEPS), NUMBER_OF_CITIES))
 SusceptibleN[0, :] = POPULATION
 SusceptibleN[0, :] -= INITIAL_INFECTED
@@ -69,11 +123,12 @@ RemovedN = np.zeros((len(TIME_STEPS), NUMBER_OF_CITIES))
 
 Compartment = [SusceptibleN[0, :], InfectedN[0, :], RemovedN[0, :]]
 
-sumS = np.zeros(np.shape(TIME_STEPS))  # array for total numbers of all cities
+# array for total numbers of all cities
+sumS = np.zeros(np.shape(TIME_STEPS))
 sumI = np.zeros(np.shape(TIME_STEPS))
 sumR = np.zeros(np.shape(TIME_STEPS))
 
-for i in range(0, TOTAL_STEPS):
+for i in range(1, TOTAL_STEPS):
     Compartment = ess.rk4_step(sir, Compartment, [INFECTION_RATE, REMOVAL_RATE, ADJACENCY_MATRIX], TIME_STEP)
     SusceptibleN[i], InfectedN[i], RemovedN[i, :] = Compartment  # SusceptibleN[i] works like SusceptibleN[i,:]
     sumS[i] = sum(SusceptibleN[i, :])
@@ -154,6 +209,17 @@ def plot_sir_network():
     plt.clf()
 
 
-create_network_plot("./Network", save_figs=True, only_calc_last=False, plot_figures=False)
+"""
+adj = read_sir_csv(PATH_SIR_ADJACENCY)
+plc = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=PLACEHOLDER_COL)
+vals = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=VALUE_COL)
+cats = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=CATEGORY_COL)
+
+fin = replace_placeholders(adj, plc, vals, cats)
+
+print(np.transpose(fin))
+"""
+
+# create_network_plot("./Network", save_figs=True, only_calc_last=False, plot_figures=False)
 plot_sir_network()
-ess.create_video_of_images("./Network")
+# ess.create_video_of_images("./Network")
