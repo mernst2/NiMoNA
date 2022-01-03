@@ -81,6 +81,7 @@ def sir_as_network(compartment, infection_rate, removal_rate, adjacency_matrix_p
 
     sir_adjacency_matrix = replace_placeholders(sir_adjacency_matrix, sir_placeholders, sir_placeholder_values,
                                                 sir_placeholder_categories)
+    # TODO: Evaluate string elements of Matrix
     # TODO: Change compartment variable into 11D Array with 3 entries (S, I, R eg.) instead of 3D Array with 11 entries
     # TODO: Calculate total population
     # TODO: Replace every Variable in Matrix with its current values
