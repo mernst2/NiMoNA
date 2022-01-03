@@ -1,5 +1,4 @@
 import numpy
-
 import numpy as np
 import matplotlib.pyplot as plt
 import siressentials as ess
@@ -209,7 +208,6 @@ def plot_sir_network():
     plt.clf()
 
 
-"""
 adj = read_sir_csv(PATH_SIR_ADJACENCY)
 plc = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=PLACEHOLDER_COL)
 vals = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=VALUE_COL)
@@ -218,7 +216,7 @@ cats = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=CATEGORY_COL)
 fin = replace_placeholders(adj, plc, vals, cats)
 
 print(np.transpose(fin))
-"""
+
 
 # create_network_plot("./Network", save_figs=True, only_calc_last=False, plot_figures=False)
 plot_sir_network()
