@@ -1,4 +1,6 @@
-infection_rate,0.22,p
-infectious,20,v
-total_population,100,v
-remove_rate,0.002,p
+infection_rate,0.35,p
+remove_rate,0.035,p
+susceptible,0,v
+infectious,0,v
+removed,0,v
+total_population,0,v

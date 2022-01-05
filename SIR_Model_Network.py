@@ -2,7 +2,6 @@ import numpy
 import numpy as np
 import matplotlib.pyplot as plt
 import siressentials as ess
-import numexpr
 
 # Paths
 PATH_ADJACENCY_CSV = 'AdjacencyMuenster.csv'
@@ -53,15 +52,15 @@ def read_sir_csv(path_to_input_network, columns=None, ADelimiter=','):
 def replace_placeholders(adjacency_matrix_str, placeholder_list, value_list, category_list, category='p'):
     adjacency_matrix_final = np.copy(adjacency_matrix_str)
 
-    for i in range(0, len(adjacency_matrix_str)):
+    for z in range(0, len(adjacency_matrix_str)):
         for j in range(0, len(adjacency_matrix_str)):
-            current_entry = adjacency_matrix_str[i, j]
+            current_entry = adjacency_matrix_str[z, j]
             for p in range(0, len(placeholder_list)):
                 if np.char.find(current_entry, placeholder_list[p], start=0, end=None) != -1 \
                         and category_list[p] == category:
-                    current_entry = np.char.replace(current_entry, placeholder_list[p], value_list[p])
+                    current_entry = np.char.replace(current_entry, placeholder_list[p], str(value_list[p]))
 
-            adjacency_matrix_final[i, j] = current_entry
+            adjacency_matrix_final[z, j] = current_entry
 
     return adjacency_matrix_final
 
@@ -70,9 +69,17 @@ def replace_variables(adjacency_matrix_str, placeholder_list, value_list, catego
     return replace_placeholders(adjacency_matrix_str, placeholder_list, value_list, category_list, category='v')
 
 
+def evaluate_string_matrix(matrix):
+    result = np.zeros(np.shape(matrix), dtype=np.float)
+    for r in range(0, len(result)):
+        for j in range(0, len(result)):
+            result[r][j] = ess.eval_expr(str(matrix[r][j]))
+    return result
+
+# TODO: Make the population stream dependent on the count of compartments
+# TODO: Refactor and optimize the code
 def sir_as_network(compartment, infection_rate, removal_rate, adjacency_matrix_population):
-    Susceptible, Infected, Removed = compartment
-    TotalPopulation = SusceptibleN[0, :] + InfectedN[0, :] + RemovedN[0, :]
+    workingCompartment = np.transpose(compartment)
 
     sir_adjacency_matrix = read_sir_csv(PATH_SIR_ADJACENCY)
     sir_placeholders = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=PLACEHOLDER_COL)
@@ -81,15 +88,77 @@ def sir_as_network(compartment, infection_rate, removal_rate, adjacency_matrix_p
 
     sir_adjacency_matrix = replace_placeholders(sir_adjacency_matrix, sir_placeholders, sir_placeholder_values,
                                                 sir_placeholder_categories)
-    # TODO: Evaluate string elements of Matrix
-    # TODO: Change compartment variable into 11D Array with 3 entries (S, I, R eg.) instead of 3D Array with 11 entries
-    # TODO: Calculate total population
-    # TODO: Replace every Variable in Matrix with its current values
-    # TODO: Iterate over NUMBER_OF_CITIES and calc the dS, dI, dR for each city
-    # TODO: Reparse the result array to match with former sir - function
 
-    result = np.matmul(np.transpose(sir_adjacency_matrix), compartment)
-    return result
+    count_p = 0
+    count_v = 0
+
+    for cat in sir_placeholder_categories:
+        if cat == 'v':
+            count_v = count_v + 1
+        elif cat == 'p':
+            count_p = count_p + 1
+        else:
+            raise RuntimeError
+
+    total_population = []
+    for o in range(0, NUMBER_OF_CITIES):
+        total_population.append(sum(workingCompartment[o, :]))
+
+    total_population = np.copy(total_population)
+    # Vals for compartments needs to be in the same order as the compartments itself,
+    # eg "SIR" -> "Val S, Val I, Val R"
+    # Sum of Compartments are at the end
+    value_list_variables = np.eye(NUMBER_OF_CITIES, count_p + count_v)
+
+    for h in range(0, NUMBER_OF_CITIES):
+        temp = workingCompartment[h]
+        temp = np.append(temp, total_population[h])
+        for u in range(0, count_p):
+            value_list_variables[h][u] = sir_placeholder_values[u]
+        for g in range(count_p, count_v + count_p):
+            value_list_variables[h][g] = temp[g - count_p]
+
+    value_list_variables = np.array(value_list_variables)
+    sir_adjacency_matrix_cities = []
+
+    for k in range(0, NUMBER_OF_CITIES):
+        val = value_list_variables[k]
+        temp = replace_variables(sir_adjacency_matrix, sir_placeholders, val,
+                                 sir_placeholder_categories)
+        sir_adjacency_matrix_cities.append(temp)
+
+    sir_adjacency_matrix_evaluated = []
+    for w in range(0, NUMBER_OF_CITIES):
+        sir_adjacency_matrix_evaluated.append(evaluate_string_matrix(np.array(sir_adjacency_matrix_cities[w])))
+
+    sir_adjacency_matrix_evaluated = np.array(sir_adjacency_matrix_evaluated)
+
+    result = np.zeros([11, 3])
+
+    for t in range(0, NUMBER_OF_CITIES):
+        adj = sir_adjacency_matrix_evaluated[t]
+        result[t] = np.matmul(np.transpose(adj), workingCompartment[t])
+
+    result_transposed = np.transpose(result)
+
+    dS = result_transposed[0]
+    dI = result_transposed[1]
+    dR = result_transposed[2]
+
+    for n in range(0, NUMBER_OF_CITIES):
+        for m in range(0, NUMBER_OF_CITIES):
+            if m != n:
+                dS[n] += adjacency_matrix_population[n, m] / total_population[m] * compartment[0][m] - \
+                         adjacency_matrix_population[m, n] / \
+                         total_population[n] * compartment[0][n]
+                dI[n] += adjacency_matrix_population[n, m] / total_population[m] * compartment[1][m] - \
+                         adjacency_matrix_population[m, n] / \
+                         total_population[n] * compartment[1][n]
+                dR[n] += adjacency_matrix_population[n, m] / total_population[m] * compartment[2][m] - \
+                         adjacency_matrix_population[m, n] / \
+                         total_population[n] * compartment[2][n]
+
+    return np.array([dS, dI, dR])
 
 
 def sir(compartment, infection_rate, removal_rate, adjacency_matrix):
@@ -109,6 +178,7 @@ def sir(compartment, infection_rate, removal_rate, adjacency_matrix):
                          TotalPopulation[n] * Infected[n]
                 dR[n] += adjacency_matrix[n, m] / TotalPopulation[m] * Removed[m] - adjacency_matrix[m, n] / \
                          TotalPopulation[n] * Removed[n]
+
     return np.array([dS, dI, dR])
 
 
@@ -131,12 +201,13 @@ sumS = np.zeros(np.shape(TIME_STEPS))
 sumI = np.zeros(np.shape(TIME_STEPS))
 sumR = np.zeros(np.shape(TIME_STEPS))
 
-for i in range(1, TOTAL_STEPS):
-    Compartment = ess.rk4_step(sir, Compartment, [INFECTION_RATE, REMOVAL_RATE, ADJACENCY_MATRIX], TIME_STEP)
+for i in range(0, TOTAL_STEPS):
+    Compartment = ess.rk4_step(sir_as_network, Compartment, [INFECTION_RATE, REMOVAL_RATE, ADJACENCY_MATRIX], TIME_STEP)
     SusceptibleN[i], InfectedN[i], RemovedN[i, :] = Compartment  # SusceptibleN[i] works like SusceptibleN[i,:]
     sumS[i] = sum(SusceptibleN[i, :])
     sumI[i] = sum(InfectedN[i, :])
     sumR[i] = sum(RemovedN[i, :])
+    print("Iteration {it} finished".format(it=i))
 
 popCSV = ess.read_population_csv(PATH_POPULATIONS_CSV, NUMBER_OF_CITIES)
 DistrictNameList = popCSV[0]  # to read first row of populations2.csv, to use for plot titles
@@ -210,16 +281,6 @@ def plot_sir_network():
     plt.savefig('./SIRNetwork.png')
     plt.show()
     plt.clf()
-
-
-adj = read_sir_csv(PATH_SIR_ADJACENCY)
-plc = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=PLACEHOLDER_COL)
-vals = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=VALUE_COL)
-cats = read_sir_csv(PATH_SIR_PLACEHOLDERS, columns=CATEGORY_COL)
-
-fin = replace_placeholders(adj, plc, vals, cats)
-
-print(np.transpose(fin))
 
 
 # create_network_plot("./Network", save_figs=True, only_calc_last=False, plot_figures=False)
