@@ -21,7 +21,7 @@ def rk4_step(rhs, variable, function_parameter, step_size):
     return variable + step_size / 6. * (k1 + 2 * (k2 + k3) + k4)
 
 
-def read_population_csv(path_to_csv, city_count, delimiter=','):
+def read_population_csv(path_to_csv, city_count, number_of_columns, delimiter=','):
     with open(path_to_csv) as csvfile:
         nameList = [[]] * city_count
         positionsX = [[]] * city_count
@@ -31,8 +31,8 @@ def read_population_csv(path_to_csv, city_count, delimiter=','):
         CSV = csv.reader(csvfile, delimiter=delimiter)
         for row in CSV:
             nameList[i] = row[0]
-            positionsX[i] = row[3]
-            positionsY[i] = row[4]
+            positionsX[i] = row[number_of_columns-2]
+            positionsY[i] = row[number_of_columns-1]
             i = i + 1
     return [nameList, positionsX, positionsY]
 
