@@ -16,7 +16,7 @@ DEFAULT_DELIMITER = ','
 # Paths
 PATH_ADJACENCY_CSV = 'AdjacencyMuenster.csv'
 PATH_POPULATIONS_CSV = 'Populations2.csv'
-PATH_SIR_ADJACENCY = 'SIR.csv'
+PATH_SIR_ADJACENCY = 'Model_Adjacency.csv'
 PATH_SIR_PLACEHOLDERS = 'Placeholder.csv'
 
 PLACEHOLDER_COL = 0
