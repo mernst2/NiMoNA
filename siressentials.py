@@ -29,6 +29,7 @@ def read_population_csv(path_to_csv, city_count, number_of_columns, delimiter=',
 
         i = 0
         CSV = csv.reader(csvfile, delimiter=delimiter)
+
         for row in CSV:
             nameList[i] = row[0]
             positionsX[i] = row[number_of_columns-2]

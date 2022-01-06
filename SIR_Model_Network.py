@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 import siressentials as ess
 import time
 
+# Parameters for variable count of compartments
+# ONLY CHANGE HERE
+COLS_TO_USE = (1, 2, 3)
+TOTAL_COLUMNS = 6
+
 # Constants
 NOT_CONTAINS = -1
 DEFAULT_DELIMITER = ','
@@ -38,7 +43,7 @@ ADJACENCY_MUENSTER_CSV = np.loadtxt(PATH_ADJACENCY_CSV, delimiter=DEFAULT_DELIMI
 #       compartments
 # When more than 3 compartments are used, the parameter 'usecols' needs to be changed. City positions always
 # need to be in the last two columns in the order x, y
-POPULATION_CSV = np.loadtxt(PATH_POPULATIONS_CSV, delimiter=DEFAULT_DELIMITER, usecols=(1, 2, 3))
+POPULATION_CSV = np.loadtxt(PATH_POPULATIONS_CSV, delimiter=DEFAULT_DELIMITER, usecols=COLS_TO_USE)
 POPULATION = POPULATION_CSV[:, 0]
 NUMBER_OF_COMPARTMENTS = len(POPULATION_CSV[0])
 
@@ -138,7 +143,6 @@ def sir_as_network(compartment, adjacency_matrix_population):
         for g in range(number_of_placeholders, number_of_variables + number_of_placeholders):
             value_list_variables[h][g] = temp[g - number_of_placeholders]
 
-    value_list_variables = np.array(value_list_variables)
     sir_adjacency_matrix_cities = []
 
     for k in range(0, NUMBER_OF_CITIES):
@@ -194,7 +198,7 @@ time_after = time.time()
 print("Duration: {dt}s".format(dt=time_after-time_before))
 
 # TODO: Make read_population_csv read the total number of columns in the csv and remove the argument
-pop_csv = ess.read_population_csv(PATH_POPULATIONS_CSV, NUMBER_OF_CITIES, 6)
+pop_csv = ess.read_population_csv(PATH_POPULATIONS_CSV, NUMBER_OF_CITIES, TOTAL_COLUMNS)
 district_name_list = pop_csv[INDEX_CITY_NAMES]  # to read first row of populations2.csv, to use for plot titles
 cities_position_x = pop_csv[INDEX_POS_X]
 cities_position_y = pop_csv[INDEX_POS_Y]
