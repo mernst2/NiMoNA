@@ -31,10 +31,11 @@ INDEX_POS_X = 1
 INDEX_POS_Y = 2
 
 TIME_STEP = 0.1
-TEND = 150
+DAYS = 365
+daysInLockdown = 0
 
-TOTAL_STEPS = int(TEND / TIME_STEP)
-TIME_STEPS = np.linspace(start=0, stop=TEND, num=TOTAL_STEPS)
+TOTAL_STEPS = int(DAYS / TIME_STEP)
+TIME_STEPS = np.linspace(start=0, stop=DAYS, num=TOTAL_STEPS)
 ITERATION_STEPS = range(0, TOTAL_STEPS)
 
 ADJACENCY_MUENSTER_CSV = np.loadtxt(PATH_ADJACENCY_CSV, delimiter=DEFAULT_DELIMITER, skiprows=1,

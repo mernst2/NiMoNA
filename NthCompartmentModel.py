@@ -165,7 +165,7 @@ for iteration in ITERATION_STEPS:
                                 modelPlaceholders,
                                 modelPlaceholderValues,
                                 modelPlaceholderCategories,
-                                ADJACENCY_MATRIX_CITIES, iteration],
+                                ADJACENCY_MATRIX_CITIES, TIME_STEPS[iteration]],
                                TIME_STEP)
 
     for city in COMPARTMENTS:
